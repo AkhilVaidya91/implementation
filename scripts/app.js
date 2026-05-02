@@ -239,10 +239,19 @@ function renderNoticesScreen() {
 
 function renderMapScreen() {
   const selectedCategory = document.querySelector(".category-btn.active")?.dataset.category || "All";
-  
-  const filteredLocations = selectedCategory === "All" 
+  const searchQuery = document.getElementById("map-search")?.value.toLowerCase().trim() || "";
+
+  let filteredLocations = selectedCategory === "All" 
     ? mockData.locations 
     : mockData.locations.filter(loc => loc.category === selectedCategory);
+
+  if (searchQuery) {
+    filteredLocations = filteredLocations.filter(loc => 
+      loc.name.toLowerCase().includes(searchQuery) ||
+      loc.category.toLowerCase().includes(searchQuery) ||
+      loc.description.toLowerCase().includes(searchQuery)
+    );
+  }
 
   return `
     <div class="screen-content">
@@ -250,12 +259,23 @@ function renderMapScreen() {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: var(--spacing-md); vertical-align: middle;">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S15.33 8 14.5 8 13 8.67 13 9.5s.67 1.5 1.5 1.5z"/>
         </svg>
-        Campus Map
+        IIT Bombay Map
       </h2>
+      <p class="section-subtitle">Browse the Powai campus with open source OpenStreetMap tiles and explore landmarks, dining, and study spaces.</p>
+
+      <div class="card map-card">
+        <div class="flex-between">
+          <div>
+            <h3 style="margin-bottom: var(--spacing-xs);">OpenStreetMap view</h3>
+            <p class="map-card-copy">Live campus map centered on IIT Bombay's main academic and student zones.</p>
+          </div>
+          <span class="chip chip-secondary">OpenStreetMap</span>
+        </div>
+      </div>
 
       <div class="search-container">
-        <input type="text" class="input-field" id="map-search" placeholder="Search buildings, rooms, or departments..." />
-        <button class="filter-btn">
+        <input type="text" class="input-field" id="map-search" placeholder="Search IIT Bombay buildings, halls, or services..." />
+        <button class="filter-btn" aria-label="Search map">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
           </svg>
@@ -268,41 +288,29 @@ function renderMapScreen() {
         <button class="category-btn" data-category="Dining">Dining</button>
         <button class="category-btn" data-category="Libraries">Libraries</button>
         <button class="category-btn" data-category="Facilities">Facilities</button>
+        <button class="category-btn" data-category="Landmarks">Landmarks</button>
       </div>
 
       <div class="map-container">
-        <div class="map-placeholder">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S15.33 8 14.5 8 13 8.67 13 9.5s.67 1.5 1.5 1.5z"/>
-          </svg>
-          <div>Interactive Map</div>
-        </div>
+        <iframe class="map-embed" src="https://www.openstreetmap.org/export/embed.html?bbox=72.9045%2C19.1294%2C72.9215%2C19.1372&amp;layer=mapnik&amp;marker=19.1333%2C72.9133" title="IIT Bombay Campus Map"></iframe>
+        <div class="map-embed-credit">Map data © OpenStreetMap contributors</div>
       </div>
 
-      <h3 class="section-title">Locations</h3>
+      <h3 class="section-title">Campus Locations</h3>
       ${filteredLocations.map(loc => `
-        <div class="list-item">
-          <div class="list-item-header">
-            <div>
-              <div class="list-item-title">${loc.icon} ${loc.name}</div>
-              <div class="list-item-meta">
-                <span>${loc.category}</span>
-              </div>
-            </div>
+        <div class="map-location-card">
+          <div class="map-location-header">
+            <div class="map-location-title">${loc.icon} ${loc.name}</div>
+            <span class="chip ${loc.category === 'Dining' ? 'chip-tertiary' : loc.category === 'Libraries' ? 'chip-secondary' : 'chip-primary'}">${loc.category}</span>
           </div>
-          <div class="list-item-description">${loc.description}</div>
-          <div class="list-item-meta">
-            <svg viewBox="0 0 24 24" fill="currentColor">
+          <div class="map-location-description">${loc.description}</div>
+          <div class="map-location-meta">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
             </svg>
             ${loc.hours}
           </div>
-          <button class="btn btn-primary btn-sm" style="margin-top: var(--spacing-md);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.364 5.636l-12.728 12.728M6.636 5.636l12.728 12.728"/>
-            </svg>
-            Directions
-          </button>
+          <button class="btn btn-secondary btn-sm">View on map</button>
         </div>
       `).join("")}
     </div>
@@ -418,11 +426,10 @@ function attachEventListeners() {
     });
   }
 
-  // Map search (placeholder)
   const mapSearch = document.getElementById("map-search");
   if (mapSearch) {
-    mapSearch.addEventListener("input", (e) => {
-      // Could add filtering logic here
+    mapSearch.addEventListener("input", () => {
+      renderScreen("map");
     });
   }
 }
