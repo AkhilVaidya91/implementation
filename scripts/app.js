@@ -320,19 +320,42 @@ function renderMapScreen() {
 
 function initializeMapScreen() {
   const mapElement = document.getElementById("leaflet-map");
-  if (!mapElement || typeof L === "undefined") return;
+  if (!mapElement) {
+    console.error("Map element not found");
+    return;
+  }
+  if (typeof L === "undefined") {
+    console.error("Leaflet library not loaded");
+    return;
+  }
+
+  const rect = mapElement.getBoundingClientRect();
+  console.log("Initializing map...", mapElement.offsetWidth, mapElement.offsetHeight, rect, window.getComputedStyle(mapElement).display, window.getComputedStyle(mapElement).visibility);
+
+  if (mapElement.offsetWidth === 0 || mapElement.offsetHeight === 0 || rect.width === 0 || rect.height === 0) {
+    console.log("Map element has no dimensions, retrying...");
+    setTimeout(() => initializeMapScreen(), 500);
+    return;
+  }
 
   if (mapInstance) {
     mapInstance.remove();
     mapInstance = null;
   }
 
+  // Ensure the element has dimensions
+  mapElement.style.width = "100%";
+  mapElement.style.height = "100%";
+
   mapInstance = L.map(mapElement, { zoomControl: true }).setView([19.1333, 72.9133], 15);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
+    crossOrigin: true
   }).addTo(mapInstance);
+
+  console.log("Map initialized, adding markers...");
 
   mockData.locations.forEach((loc) => {
     const lat = 19.1333 + (loc.coords.y - 50) * 0.00024;
@@ -342,9 +365,13 @@ function initializeMapScreen() {
       .bindPopup(`<strong>${loc.name}</strong><br>${loc.category}`);
   });
 
+  // Force a resize after a delay
   setTimeout(() => {
-    mapInstance.invalidateSize();
-  }, 250);
+    if (mapInstance) {
+      mapInstance.invalidateSize();
+      console.log("Map size invalidated", mapElement.offsetWidth, mapElement.offsetHeight);
+    }
+  }, 500);
 }
 
 function renderDirectoryScreen() {
@@ -431,7 +458,11 @@ function renderScreen(screenName) {
   attachEventListeners();
 
   if (screenName === "map") {
-    initializeMapScreen();
+    console.log("Rendering map screen, initializing map...");
+    // Wait for the next tick to ensure DOM is updated
+    setTimeout(() => {
+      initializeMapScreen();
+    }, 100);
   }
 }
 
@@ -439,14 +470,15 @@ function attachEventListeners() {
   // Category filter buttons for map screen
   document.querySelectorAll(".category-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
+      const button = e.currentTarget;
       if (currentScreen === "map") {
         document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
-        e.target.classList.add("active");
+        button.classList.add("active");
         renderScreen("map");
       } else if (currentScreen === "directory") {
         document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("active"));
-        e.target.classList.add("active");
-        directorySortBy = e.target.dataset.dept;
+        button.classList.add("active");
+        directorySortBy = button.dataset.dept;
         renderScreen("directory");
       }
     });

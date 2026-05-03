@@ -2,7 +2,7 @@
 
 const mockData = {
   user: {
-    name: "Alex",
+    name: "Akhil",
     avatar: "👨‍🎓"
   },
 
@@ -182,50 +182,50 @@ const mockData = {
   faculty: [
     {
       id: 1,
-      name: "Dr. Sarah Jenkins",
+      name: "Dr. Aniket Pethe",
       title: "Head of Computer Science",
       department: "Computer Science",
-      email: "s.jenkins@modernscholar.edu",
+      email: "a.pethe@modernscholar.edu",
       office: "Cabin 402, Turing Hall",
       hours: "Tue/Thu 2-4 PM",
       avatar: "👩‍🏫"
     },
     {
       id: 2,
-      name: "Prof. Marcus Chen",
+      name: "Prof. Aviraj Singh",
       title: "Professor of Physics",
       department: "Engineering",
-      email: "m.chen@modernscholar.edu",
+      email: "a.singh@modernscholar.edu",
       office: "Lab 215, Science Center",
       hours: "Mon/Wed 1-3 PM",
       avatar: "👨‍🏫"
     },
     {
       id: 3,
-      name: "Dr. Elena Rodriguez",
+      name: "Dr. Yash Desai",
       title: "Associate Professor of Liberal Arts",
       department: "Liberal Arts",
-      email: "e.rodriguez@modernscholar.edu",
+      email: "y.desai@modernscholar.edu",
       office: "Office 310, Humanities Hall",
       hours: "Wed/Fri 2-4 PM",
       avatar: "👩‍🏫"
     },
     {
       id: 4,
-      name: "Prof. James Mitchell",
+      name: "Prof. Devika Nikam",
       title: "Professor of Business Studies",
       department: "Business",
-      email: "j.mitchell@modernscholar.edu",
+      email: "d.nikam@modernscholar.edu",
       office: "Suite 500, Commerce Building",
       hours: "By appointment",
       avatar: "👨‍🏫"
     },
     {
       id: 5,
-      name: "Dr. Aisha Patel",
+      name: "Dr. Omkar Surve",
       title: "Director of Student Affairs",
       department: "Student Services",
-      email: "a.patel@modernscholar.edu",
+      email: "o.surve@modernscholar.edu",
       office: "Building A, Ground Floor",
       hours: "Mon-Fri 9 AM - 5 PM",
       avatar: "👩‍💼"

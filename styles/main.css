@@ -711,9 +711,6 @@ input {
   position: relative;
   overflow: hidden;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
   color: var(--on-surface-variant);
   font-size: 0.875rem;
 }
