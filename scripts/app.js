@@ -2,6 +2,7 @@
 
 let currentScreen = "home";
 let directorySortBy = "All Departments";
+let mapInstance = null;
 
 // ===========================
 // UTILITY FUNCTIONS
@@ -292,7 +293,7 @@ function renderMapScreen() {
       </div>
 
       <div class="map-container">
-        <iframe class="map-embed" src="https://www.openstreetmap.org/export/embed.html?bbox=72.9045%2C19.1294%2C72.9215%2C19.1372&amp;layer=mapnik&amp;marker=19.1333%2C72.9133" title="IIT Bombay Campus Map"></iframe>
+        <div id="leaflet-map" class="leaflet-map"></div>
         <div class="map-embed-credit">Map data © OpenStreetMap contributors</div>
       </div>
 
@@ -315,6 +316,35 @@ function renderMapScreen() {
       `).join("")}
     </div>
   `;
+}
+
+function initializeMapScreen() {
+  const mapElement = document.getElementById("leaflet-map");
+  if (!mapElement || typeof L === "undefined") return;
+
+  if (mapInstance) {
+    mapInstance.remove();
+    mapInstance = null;
+  }
+
+  mapInstance = L.map(mapElement, { zoomControl: true }).setView([19.1333, 72.9133], 15);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  }).addTo(mapInstance);
+
+  mockData.locations.forEach((loc) => {
+    const lat = 19.1333 + (loc.coords.y - 50) * 0.00024;
+    const lon = 72.9133 + (loc.coords.x - 50) * 0.00032;
+    L.marker([lat, lon])
+      .addTo(mapInstance)
+      .bindPopup(`<strong>${loc.name}</strong><br>${loc.category}`);
+  });
+
+  setTimeout(() => {
+    mapInstance.invalidateSize();
+  }, 250);
 }
 
 function renderDirectoryScreen() {
@@ -399,6 +429,10 @@ function renderScreen(screenName) {
 
   mainContent.innerHTML = content;
   attachEventListeners();
+
+  if (screenName === "map") {
+    initializeMapScreen();
+  }
 }
 
 function attachEventListeners() {
